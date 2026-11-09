@@ -1,0 +1,36 @@
+name: Pinned uv
+description: >-
+  Install one exact uv with the runner image's pipx. Plain steps only: the
+  Shorewood-Analytics organization allows only GitHub-created and
+  organization-owned actions, so astral-sh/setup-uv cannot run here. Nothing
+  is cached between runs. Dependabot does not track this pin; bump the default
+  below by hand.
+inputs:
+  version:
+    description: uv version to install (exact)
+    required: false
+    default: "0.13.7"
+runs:
+  using: composite
+  steps:
+    - name: Install uv ${{ inputs.version }} with pipx
+      shell: bash
+      env:
+        UV_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        # --force: a uv that pipx already has (any version) is replaced, never silently kept.
+        pipx install --force "uv==$UV_VERSION"
+        bin="$(pipx environment --value PIPX_BIN_DIR)"
+        # Assert the pin before anything reaches PATH: a wrong version fails the step with no side effect.
+        test "$("$bin/uv" --version | cut -d' ' -f2)" = "$UV_VERSION"
+        echo "$bin" >> "$GITHUB_PATH"
+    - name: Check the uv and uvx on PATH are the pin
+      shell: bash
+      env:
+        UV_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        command -v uv uvx
+        test "$(uv --version | cut -d' ' -f2)" = "$UV_VERSION"
+        test "$(uvx --version | cut -d' ' -f2)" = "$UV_VERSION"

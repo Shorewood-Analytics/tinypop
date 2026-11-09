@@ -35,10 +35,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install uv
-        run: |
-          pipx install uv
-          pipx environment --value PIPX_BIN_DIR >> "$GITHUB_PATH"
+      - uses: ./.github/actions/uv
       - run: uv sync --locked
       - run: uv run ruff format --check
       - run: uv run ruff check --output-format=github
