@@ -53,11 +53,8 @@ jobs:
         id: guard
         run: |
           if [ -n "$(git tag --points-at HEAD 'v*')" ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; fi
-      - name: Install uv
+      - uses: ./.github/actions/uv
         if: steps.guard.outputs.skip != 'true'
-        run: |
-          pipx install uv
-          pipx environment --value PIPX_BIN_DIR >> "$GITHUB_PATH"
       - name: Tag, test, build
         if: steps.guard.outputs.skip != 'true'
         id: tag

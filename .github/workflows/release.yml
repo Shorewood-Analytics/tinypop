@@ -20,10 +20,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Install uv
-        run: |
-          pipx install uv
-          pipx environment --value PIPX_BIN_DIR >> "$GITHUB_PATH"
+      - uses: ./.github/actions/uv
       - name: Tag matches computed project version
         run: test "$(uvx uv-dynamic-versioning)" = "${GITHUB_REF_NAME#v}"
       - run: uv sync --locked
